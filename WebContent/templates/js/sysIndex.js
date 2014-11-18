@@ -1,0 +1,3 @@
+function kk(){
+	alert("ssssssssssss");
+}

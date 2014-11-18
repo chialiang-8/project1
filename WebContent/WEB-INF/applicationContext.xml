@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+xmlns:tx="http://www.springframework.org/schema/tx" 
+xmlns:aop="http://www.springframework.org/schema/aop" 
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop    
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd"> 
+    <context:property-placeholder ignore-unresolvable="true" location="classpath*:/project.properties" />
+  
+    <bean id="dataSource" destroy-method="close"  
+        class="org.apache.commons.dbcp.BasicDataSource">  
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />  
+        <property name="url" value="jdbc:mysql://localhost:3306/project1" />  
+        <property name="username" value="project1" />  
+        <property name="password" value="project1" />  
+    </bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="packagesToScan" value="com.lz.icehouse" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+        </property>
+    </bean>
+     	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+		<!-- <property name="dataSource" ref="dataSource" /> -->
+	</bean>
+	
+<!-- 	<tx:advice id="txAdvice" transaction-manager="transactionManager">  
+        <tx:attributes>  
+            <tx:method name="get*" read-only="true"></tx:method>  
+            <tx:method name="*"></tx:method>  
+        </tx:attributes>  
+    </tx:advice>
+    <aop:config>  
+        <aop:pointcut id="pointcut"  
+            expression="  
+                execution(* com.lz.icehouse.modules.sys.manager.impl.*Impl.*(..))" />  
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut" />  
+    </aop:config> -->
+    
+    <!-- 用注解方式配置事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+    
+	<!-- 用注解方式注入bean -->
+ 	<context:annotation-config />
+	<context:component-scan base-package="com.lz.icehouse" />
+
+</beans>  
